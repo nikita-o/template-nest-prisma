@@ -2,12 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 import { Logger } from '@nestjs/common';
-import { config } from 'config/config';
+import { PrismaService } from 'prisma/prisma.service';
 
 async function bootstrap() {
+  console.log(process.env.DATABASE_URL);
+
   const app = await NestFactory.create(AppModule);
-  await app.listen(config.port, () => {
-    Logger.log(`server start: ${config.host}:${config.port}`, 'Main');
+
+  // Issues with enableShutdownHooks
+  const prismaService = app.get(PrismaService);
+  await prismaService.enableShutdownHooks(app);
+
+  await app.listen(3000, () => {
+    Logger.log(`server start: localhost:3000`, 'Main');
   });
 }
 bootstrap();
